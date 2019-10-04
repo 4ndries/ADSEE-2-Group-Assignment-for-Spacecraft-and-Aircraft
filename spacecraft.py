@@ -1,1 +1,1 @@
-# in this script the tools and calculations for the spacecraft part
+# in this script the tools and calculations for the spacecraft part are collected
