@@ -106,6 +106,7 @@ Returns Signal-to-Noise-Ratio [-]'''
 
 def main():
     '''Calculates the SNR [dB] from input'''
+    # the eval() is to allow typing fractions (5/12), scientific notation (3e9) etc.    
     P = float(eval(input('transmitter power [W]? ')))
     Ll = float(eval(input('transmitter loss factor [-]? ')))
     Dt = float(eval(input('transmitter antenna diameter [m]? ')))
