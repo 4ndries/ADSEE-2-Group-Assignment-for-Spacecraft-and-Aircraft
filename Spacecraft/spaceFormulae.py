@@ -125,7 +125,11 @@ def main():
     Tdl = float(eval(input('downlink time ratio [-]? ')))
     Ts = float(eval(input('system noise temperature [K]? ')))
     return to_dB(SNR(P, Ll, Gpeak(Dt, lambd(f), etat), La, Gpeak(Dr, lambd(f), etar),
+<<<<<<< HEAD
               Ls(lambd(f), S(h)), Lpr(ett, a12(f, Dt))*Lpr(etr, a12(f, Dr)),
+=======
+              Ls(lambd(f), S(h)), Lpr(ett, a12(f, Dt))+Lpr(etr, a12(f, Dr)),
+>>>>>>> 5cb9945ad4c90888c9c73dee6cbdef56e3a081a6
               Lr, R(Rg, Dc, Tdl), Ts))
 
 if __name__ == '__main__':
