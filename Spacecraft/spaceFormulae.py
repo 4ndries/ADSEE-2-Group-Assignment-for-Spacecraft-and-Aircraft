@@ -22,6 +22,7 @@ import numpy as np
 k = 1.38e-23    # [J/K]
 Re = 6371e3     # [m]
 c = 3e8         # [m/s]
+de = 146e6      # [m]
 
 ### functions
 def to_dB(n_, ref_=1):
@@ -51,12 +52,21 @@ S = (maximum) distance [m]
 Returns space loss [-]'''
     return (lambd_/(4*np.pi*S_))**2
 
-def S(h_):
-    '''Calculates the worst case distance between the satellite and a ground station
+def S(h_, theta_=np.nan, ds_=np.nan):
+    '''Calculates the (worst case) distance between the satellite and a ground station
 Accepts all variables in base units:
 h = satellite orbit altitude [m]
-Returns maximum distance [m]'''
-    return np.sqrt((Re+h_)**2-Re**2)
+theta = elongation angle [deg] (optional)
+ds = distance between sun and the planet the mission orbits around [m]
+Returns (maximum) distance [m]
+Remarks: 
+- if theta and ds not specified or equal to np.nan, Earth orbit is assumed
+- if calculating interplanetary distances, h is not used, so if it is unknown, just fill in 0
+'''
+    if not (np.isnan(theta_) and np.isnan(ds_)):  # calculate the interplanetary distance
+        return np.sqrt(de**2+ds_**2-2*de*ds_*np.cos(theta_*np.pi/180))  # convert theta to rad
+    else:
+        return np.sqrt((Re+h_)**2-Re**2)
 
 def lambd(f_):
     '''Calculates the wavelength [m] of radiation of a given frequency [Hz]'''
@@ -102,6 +112,13 @@ R = required data rate [bit/s]
 Ts = system noise temperature [K]
 Returns Signal-to-Noise-Ratio [-]'''
     return P_*Ll_*Gt_*La_*Gr_*Ls_*Lpr_*Lr_/(R_*k*Ts_)
+
+def SNR_req(BER=1e-6, coding='FSK8'):
+    '''Calculates the required SNR [dB] given a certain encoding and BER'''
+    if (BER == 1e-6) and (coding == 'FSK8'):
+        return 10
+    else:
+        return 10
 
 
 def main():
