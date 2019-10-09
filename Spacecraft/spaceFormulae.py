@@ -20,7 +20,7 @@ import numpy as np
 
 ### constants/variables
 k = 1.38e-23    # [J/K]
-Re = 6371000    # [m]
+Re = 6371e3     # [m]
 c = 3e8         # [m/s]
 
 ### functions
@@ -32,7 +32,7 @@ Accepts integers/floats or np arrays and returns a float or np array respectivel
 def from_dB(n_, ref_=1):
     '''Converts [db] to a physical quantity
 Accepts integers/floats or np arrays and returns a float or np array respectively'''
-    return ref_*np.exp(n_/10)
+    return ref_*10**(n_/10)
 
 def Gpeak(D_, lambd_, eta_):
     '''Calculates the peak antenna gain
@@ -106,7 +106,8 @@ Returns Signal-to-Noise-Ratio [-]'''
 
 def main():
     '''Calculates the SNR [dB] from input'''
-    # the eval() is to allow typing fractions (5/12), scientific notation (3e9) etc.    
+    # the eval() is to allow typing fractions (5/12), scientific notation (3e9)
+    # and even to use functions from the script!    
     P = float(eval(input('transmitter power [W]? ')))
     Ll = float(eval(input('transmitter loss factor [-]? ')))
     Dt = float(eval(input('transmitter antenna diameter [m]? ')))
@@ -124,8 +125,8 @@ def main():
     Tdl = float(eval(input('downlink time ratio [-]? ')))
     Ts = float(eval(input('system noise temperature [K]? ')))
     return to_dB(SNR(P, Ll, Gpeak(Dt, lambd(f), etat), La, Gpeak(Dr, lambd(f), etar),
-              Ls(lambd(f), S(h)), Lpr(ett, a12(f, Dt))+Lpr(etr, a12(f, Dr)),
-              Lr, R(Rg, Dc, Tdl), Ts)))
+              Ls(lambd(f), S(h)), Lpr(ett, a12(f, Dt))*Lpr(etr, a12(f, Dr)),
+              Lr, R(Rg, Dc, Tdl), Ts))
 
 if __name__ == '__main__':
     print(main())
