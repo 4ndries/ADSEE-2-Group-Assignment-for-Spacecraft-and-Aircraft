@@ -125,7 +125,7 @@ def main():
     Ts = float(eval(input('system noise temperature [K]? ')))
     return to_dB(SNR(P, Ll, Gpeak(Dt, lambd(f), etat), La, Gpeak(Dr, lambd(f), etar),
               Ls(lambd(f), S(h)), Lpr(ett, a12(f, Dt))+Lpr(etr, a12(f, Dr)),
-              Lr, R(Rg, Dc, Tdl), Ts)))
+              Lr, R(Rg, Dc, Tdl), Ts))
 
 if __name__ == '__main__':
     print(main())
