@@ -14,9 +14,12 @@ for downlink/uplink => we need to have a table with different options to get the
 Remarks: 
 - I'm not using dB (for now), as we don't have to calculate manually anymore
 - I'm putting trailing underscores behind function parameters, to prevent Python from using global variables/functions with the same name
+- Do we still need the text above the remarks?
 '''
+
 ### imports
 import numpy as np
+from scipy import special as sp
 
 ### constants/variables
 k = 1.38e-23    # [J/K]
@@ -113,12 +116,17 @@ Ts = system noise temperature [K]
 Returns Signal-to-Noise-Ratio [-]'''
     return P_*Ll_*Gt_*La_*Gr_*Ls_*Lpr_*Lr_/(R_*k*Ts_)
 
-def SNR_req(BER=1e-6, coding='FSK8'):
-    '''Calculates the required SNR [dB] given a certain encoding and BER'''
-    if (BER == 1e-6) and (coding == 'FSK8'):
+def SNR_req(BER_=1e-6, coding_='FSK8'):
+    '''Calculates the required SNR [dB] given a certain encoding and BER
+Remark: when using the function to calculate the SNR, it gives a lower bound, so the actual required SNR may be higher'''
+    if False:# BER_ == 1e-6 and coding_ == 'FSK8':  # deactivated this for now, to make this function continuous
         return 10
+    elif 0<BER_/2<1 and 'FSK8' in coding_:
+        return 2/3*sp.erfcinv(BER_/2)**2
     else:
-        return 10
+        print("    ERROR: Unknown encoding or Bit Error Rate out of range [0,2]")
+        return np.nan  # let it continue but still notify user of error
+#        raise ValueError("Unknown encoding or Bit Error Rate out of range [0,2]")
 
 
 def main():
@@ -145,5 +153,6 @@ def main():
                      Ls(lambd(f), S(h)), Lpr(ett, a12(f, Dt))*Lpr(etr, a12(f, Dr)),
                      Lr, R(Rg, Dc, Tdl), Ts))
 
+### main
 if __name__ == '__main__':
     print(main())

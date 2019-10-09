@@ -1,13 +1,14 @@
 # in this script the tools and calculations for the spacecraft part are collected
 # TODO:
-# - original and modified linkdata.xlsx
+# - 
 
 ### imports
 import numpy as np
 import pandas as pd
 from spaceFormulae import *
 
-data = pd.read_excel(r'linkdata.xlsx')
+data = pd.read_excel('linkdata.xlsx')
+#data = pd.read_excel('original_linkdata.xlsx')
 
 # downlink
 for sc in data.columns[2:]:
@@ -35,7 +36,7 @@ for sc in data.columns[2:]:
               Ls(lambd(f), S(h, theta, ds)), Lpr(ett, a12(f, Dt))*Lpr(etr, a12(f, Dr)),
               Lr, R(Rg, Dc, Tdl), Ts))
     SNR_margin = SNR_has - SNR_req(BER, coding)
-    print(f'''{sc} has a downlink SNR margin of {SNR_margin} dB''')
+    print(f'''{sc} has a downlink SNR margin of {np.round(SNR_margin, 3)} dB''')
 
 # uplink
 for sc in data.columns[2:]:
@@ -63,4 +64,4 @@ for sc in data.columns[2:]:
               Ls(lambd(f), S(h, theta, ds)), Lpr(ett, a12(f, Dt))*Lpr(etr, a12(f, Dr)),
               Lr, R(Rg, Dc, Tdl), Ts))
     SNR_margin = SNR_has - SNR_req(BER, coding)
-    print(f'''{sc} has an uplink SNR margin of {SNR_margin} dB''')
+    print(f'''{sc} has an uplink SNR margin of {np.round(SNR_margin, 3)} dB''')
