@@ -24,7 +24,7 @@ viscosity_cruise = 0.00001434          # from: https://www.engineeringtoolbox.co
 
 
 #calculations of more wing geometry
-Cr = 2*S/b/(1+taper_ratio)   # [m]
+Cr = 2*(S/b)*(1/(1+taper_ratio))   # [m]
 MAC = 2/3*Cr*(1+taper_ratio+taper_ratio*taper_ratio)/(1+taper_ratio)  #[m]
 YMAC = b/6*(1+2*taper_ratio)/(1+taper_ratio)   # [m]
 sweep_LE = atan(tan(sweep_quarter_chord)+Cr*(1-taper_ratio)/2/b)
