@@ -42,7 +42,7 @@ print()
 
 ########################################################### part 2
 #get the cls
-Wland = OEW + 0.2*Wfuel  #[N]
+Wland = MTOW - 0.8*Wfuel  #[N]
 CLmax = 1.1*2*Wland/density_land/S/Vland/Vland   #  1.1 safety factor like in slides
 Clmax = CLmax/(cos(sweep_quarter_chord))**2     #required Cl max at landing conditions if no flaps used
 
@@ -58,7 +58,7 @@ flapend = b/2*0.64    # [m]
 Cflap = 0.35    #flap chord [cf/c]
 #assume flap fully deflected, angle 40*, then chord increased by cos(40):
 flap_angle = 40*pi/180  #[rad]
-bigchord = 1+Cflap*cos(flap_angle)  # c'/c when flaps fully deployed (geometrical, not real)
+#bigchord = 1+Cflap*cos(flap_angle)  # c'/c when flaps fully deployed (geometrical, not real)
 bigchord2 = 1.21    # c'/c from graph, assume single slotted fowler, adsee presentation slide 36 (realistic)
 
 
