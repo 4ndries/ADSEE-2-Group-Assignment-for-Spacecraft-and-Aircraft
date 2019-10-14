@@ -24,7 +24,7 @@ viscosity_cruise = 0.00001434          # from: https://www.engineeringtoolbox.co
 
 
 #calculations of more wing geometry
-Cr = 2*(S/b)*(1/(1+taper_ratio))   # [m]
+Cr = 2*S/b/(1+taper_ratio)   # [m]
 MAC = 2/3*Cr*(1+taper_ratio+taper_ratio*taper_ratio)/(1+taper_ratio)  #[m]
 YMAC = b/6*(1+2*taper_ratio)/(1+taper_ratio)   # [m]
 sweep_LE = atan(tan(sweep_quarter_chord)+Cr*(1-taper_ratio)/2/b)
@@ -42,7 +42,7 @@ print()
 
 ########################################################### part 2
 #get the cls
-Wland = MTOW - 0.8*Wfuel  #[N]
+Wland = OEW + 0.2*Wfuel  #[N]
 CLmax = 1.1*2*Wland/density_land/S/Vland/Vland   #  1.1 safety factor like in slides
 Clmax = CLmax/(cos(sweep_quarter_chord))**2     #required Cl max at landing conditions if no flaps used
 
@@ -57,8 +57,8 @@ flapend = b/2*0.64    # [m]
 #rear spar at 0.6c, 0.05c for mechanism, 0.35 left for flaps
 Cflap = 0.35    #flap chord [cf/c]
 #assume flap fully deflected, angle 40*, then chord increased by cos(40):
-flap_angle = 40*pi/180  #[rad]
-#bigchord = 1+Cflap*cos(flap_angle)  # c'/c when flaps fully deployed (geometrical, not real)
+flap_angle = 0*pi/180  #[rad]
+bigchord = 1+Cflap*cos(flap_angle)  # c'/c when flaps fully deployed (geometrical, not real)
 bigchord2 = 1.21    # c'/c from graph, assume single slotted fowler, adsee presentation slide 36 (realistic)
 
 
@@ -69,12 +69,26 @@ reference_area = 2*((A*flapend-B*flapend*flapend)-(A*flapstart-B*flapstart*flaps
 
 sweep_LE_flaps = atan(tan(sweep_LE)-(1-Cflap)*2*Cr*(1-taper_ratio)/b)
 
-delta_Cl_max = 1.3*bigchord2
+delta_Cl_max = 1.3*bigchord
 delta_CL_max = 0.9*delta_Cl_max*reference_area*cos(sweep_LE_flaps)
 
 print(delta_CL_max)
 print("delta CL max of whole wing at full flaps")
 print()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

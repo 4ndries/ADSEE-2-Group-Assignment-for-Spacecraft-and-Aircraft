@@ -32,11 +32,34 @@ for sc in data.columns[2:]:
     Ts = 135  # assuming same value as given in example calculation
     coding = 'FSK'+str(data[sc][19])
     BER = data[sc][20]
-    SNR_has = to_dB(SNR(P, Ll, Gpeak(Dt, lambd(f), etat), La, Gpeak(Dr, lambd(f), etar),
-              Ls(lambd(f), S(h, theta, ds)), Lpr(ett, a12(f, Dt))*Lpr(etr, a12(f, Dr)),
-              Lr, R(Rg, Dc, Tdl), Ts))
-    SNR_margin = SNR_has - SNR_req(BER, coding)
-    print(f'''{sc} has a downlink SNR margin of {np.round(SNR_margin, 3)} dB''')
+
+    Gt = Gpeak(Dt, lambd(f), etat)
+    Gr = Gpeak(Dr, lambd(f), etar)
+    Lspace = Ls(lambd(f), S(h, theta, ds))
+    Lpointing = Lpr(ett, a12(f, Dt))*Lpr(etr, a12(f, Dr))
+    R_req = R(Rg, Dc, Tdl)
+    
+    SNR_has = to_dB(SNR(P, Ll, Gt, La, Gr,
+              Lspace, Lpointing,
+              Lr, R_req, Ts))
+    SNR_required = SNR_req(BER, coding)
+    SNR_margin = SNR_has - SNR_required
+    print(f'''Downlink budget {sc} [dB]:
+P: {to_dB(P)}
+Ll: {to_dB(Ll)}
+Gt: {to_dB(Gt)}
+La: {to_dB(La)}
+Gr: {to_dB(Gr)}
+Ls: {to_dB(Lspace)}
+Lpr: {to_dB(Lpointing)}
+Lr: {to_dB(Lr)}
+1/R: {to_dB(1/R_req)}
+1/k: {to_dB(1/k)}
+1/Ts: {to_dB(1/Ts)}
+Eb/N0: {SNR_has}
+Eb/N0 required: {SNR_required}
+margin: {SNR_margin}''')
+    print(f'''{sc} has a downlink SNR margin of {np.round(SNR_margin, 3)} dB\n''')
 
 # uplink
 for sc in data.columns[2:]:
@@ -60,8 +83,31 @@ for sc in data.columns[2:]:
     Ts = 135
     coding = 'FSK'+str(data[sc][19])
     BER = data[sc][20]
-    SNR_has = to_dB(SNR(P, Ll, Gpeak(Dt, lambd(f), etat), La, Gpeak(Dr, lambd(f), etar),
-              Ls(lambd(f), S(h, theta, ds)), Lpr(ett, a12(f, Dt))*Lpr(etr, a12(f, Dr)),
-              Lr, R(Rg, Dc, Tdl), Ts))
-    SNR_margin = SNR_has - SNR_req(BER, coding)
-    print(f'''{sc} has an uplink SNR margin of {np.round(SNR_margin, 3)} dB''')
+
+    Gt = Gpeak(Dt, lambd(f), etat)
+    Gr = Gpeak(Dr, lambd(f), etar)
+    Lspace = Ls(lambd(f), S(h, theta, ds))
+    Lpointing = Lpr(ett, a12(f, Dt))*Lpr(etr, a12(f, Dr))
+    R_req = R(Rg, Dc, Tdl)
+
+    SNR_has = to_dB(SNR(P, Ll, Gt, La, Gr,
+              Lspace, Lpointing,
+              Lr, R_req, Ts))
+    SNR_required = SNR_req(BER, coding)
+    SNR_margin = SNR_has - SNR_required
+    print(f'''Uplink budget {sc} [dB]:
+P: {to_dB(P)}
+Ll: {to_dB(Ll)}
+Gt: {to_dB(Gt)}
+La: {to_dB(La)}
+Gr: {to_dB(Gr)}
+Ls: {to_dB(Lspace)}1
+Lpr: {to_dB(Lpointing)}
+Lr: {to_dB(Lr)}
+1/R: {to_dB(1/R_req)}
+1/k: {to_dB(1/k)}
+1/Ts: {to_dB(1/Ts)}
+Eb/N0: {SNR_has}
+Eb/N0 required: {SNR_required}
+margin: {SNR_margin}''')
+    print(f'''{sc} has an uplink SNR margin of {np.round(SNR_margin, 3)} dB\n''')

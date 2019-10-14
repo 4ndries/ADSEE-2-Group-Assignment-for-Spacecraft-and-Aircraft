@@ -1,20 +1,8 @@
 '''
-Hereby the variables used in formulae are explained:
-
-Tc -- temperature of the noise introduced by the cable
-T0 -- clarify later; given OR reference temperature IF reference, T0 = 290 K
-L  -- loss factor, property of a cable
-Tn -- temperature of the noise introduced by the amplifier
-F  -- noise figure, ratio of noise out to noise into the amp
-
-There are different typical values of antenna noise, L, F, etc. for different frequencies
-for downlink/uplink => we need to have a table with different options to get the right values
-
-
 Remarks: 
-- I'm not using dB (for now), as we don't have to calculate manually anymore
+- dB conversions are done in the output script, here we still use the normal way of calculating
 - I'm putting trailing underscores behind function parameters, to prevent Python from using global variables/functions with the same name
-- Do we still need the text above the remarks?
+- Do we want to use SNR_req 10 for FSK8 and BER 1e-6? (This is the same in all cases and was read from the graphs provided in the lecture slides. Another way (probably ovecomplicating) is to use a function from the internet, which does underpredict it though)
 '''
 
 ### imports
@@ -119,7 +107,7 @@ Returns Signal-to-Noise-Ratio [-]'''
 def SNR_req(BER_=1e-6, coding_='FSK8'):
     '''Calculates the required SNR [dB] given a certain encoding and BER
 Remark: when using the function to calculate the SNR, it gives a lower bound, so the actual required SNR may be higher'''
-    if False:# BER_ == 1e-6 and coding_ == 'FSK8':  # deactivated this for now, to make this function continuous
+    if True:# BER_ == 1e-6 and coding_ == 'FSK8':  # always activated this for now, to make sure that we're using a required SNR of 10, as given in the slides
         return 10
     elif 0<BER_/2<1 and 'FSK8' in coding_:
         return 2/3*sp.erfcinv(BER_/2)**2
