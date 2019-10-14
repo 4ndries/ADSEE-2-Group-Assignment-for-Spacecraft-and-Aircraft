@@ -3,12 +3,18 @@
 # - 
 
 ### imports
+import sys
 import numpy as np
 import pandas as pd
 from spaceFormulae import *
 
-data = pd.read_excel('linkdata.xlsx')
-#data = pd.read_excel('original_linkdata.xlsx')
+# if you run the script with parameter -o or --original, you use linkdata_original.xlsx as input
+if len(sys.argv) > 1:
+    if sys.argv[1] in ['-o', '--original']:
+        data = pd.read_excel('original_linkdata.xlsx')
+else:
+    data = pd.read_excel('linkdata.xlsx')
+
 
 # downlink
 for sc in data.columns[2:]:
