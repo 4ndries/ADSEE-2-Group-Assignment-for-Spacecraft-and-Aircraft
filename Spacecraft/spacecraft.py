@@ -26,6 +26,7 @@ for sc in data.columns[2:]:
     ds = data[sc][11]*1e3  # convert km to m
     ett = data[sc][12]
     etr = 0.1*a12(f, Dr)  # assuming the same relation as in the example calculation
+    # Include orbital velocity so we know how many rows per second are scanned, instead of one row per second...
     Rg = data[sc][14]/(data[sc][15]/21600)*data[sc][16]  # convert arcminutes to deg
     Dc = data[sc][17]
     Tdl = data[sc][18]/24  # hrs/day to ratio of hrs/24h
@@ -88,7 +89,7 @@ for sc in data.columns[2:]:
     Gr = Gpeak(Dr, lambd(f), etar)
     Lspace = Ls(lambd(f), S(h, theta, ds))
     Lpointing = Lpr(ett, a12(f, Dt))*Lpr(etr, a12(f, Dr))
-    R_req = R(Rg, Dc, Tdl)
+    R_req = Rg  #R(Rg, Dc, Tdl)  # Uplink data rate independent of Payload duty cycle and downlink time
 
     SNR_has = to_dB(SNR(P, Ll, Gt, La, Gr,
               Lspace, Lpointing,
