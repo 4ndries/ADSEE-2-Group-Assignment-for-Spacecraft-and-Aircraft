@@ -81,18 +81,21 @@ D = antenna diameter [m]
 Returns the half-power angle [deg]'''
     return 21/(f_*D_*1e-9)  # convert Hz to GHz
 
-def R(Rg_, Dc_, Tdl_, h_):
+def R(Rg_, Dc_, Tdl_, h_, pxs_):
     '''Calculates the required data rate
 Accepts all variables in base units:
 Rg = spacecraft generated data rate [bit/s]
 Dc = duty cycle [-]
 Tdl = downlink time ratio [-]
+h = orbital altitude [m]
+pxs = pixel size [deg]
 Returns the required data rate in [bit/s]'''
     T_ = 2*np.pi*np.sqrt((h_+Re)/mu)  # orbital period
     d_ = Re*2*np.pi  # circumference of Earth alias distance scanned
-    lps_ = (d_/T_)  # lines per second scanned
-    B_ = Rg_*Dc_/Tdl_  # bits per line
-    return B_*lps_
+    # lines per second scanned (using small angle approximation)
+    lps_= (d_/T_)/(h_*(pxs_/180*np.pi))  # meter per second scanned / meter per pixel
+    bpl_ = Rg_*Dc_/Tdl_  # bits per line
+    return bpl_*lps_
 
 def SNR(P_, Ll_, Gt_, La_, Gr_, Ls_, Lpr_, Lr_, R_, Ts_):
     '''Accepts all variables from the link budget equation:

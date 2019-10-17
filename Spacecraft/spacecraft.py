@@ -33,7 +33,8 @@ for sc in data.columns[2:]:
     ett = data[sc][12]
     etr = 0.1*a12(f, Dr)  # assuming the same relation as in the example calculation
     # Include orbital velocity so we know how many rows per second are scanned, instead of one row per second...
-    Rg = data[sc][14]/(data[sc][15]/21600)*data[sc][16]  # convert arcminutes to deg
+    res = data[sc][15]/21600  # convert arcminutes to deg
+    Rg = data[sc][14]/res*data[sc][16]
     Dc = data[sc][17]
     Tdl = data[sc][18]/24  # hrs/day to ratio of hrs/24h
     Ts = 135  # assuming same value as given in example calculation
@@ -44,8 +45,8 @@ for sc in data.columns[2:]:
     Gr = Gpeak(Dr, lambd(f), etar)
     Lspace = Ls(lambd(f), S(h, theta, ds))
     Lpointing = Lpr(ett, a12(f, Dt))*Lpr(etr, a12(f, Dr))
-    R_req = R(Rg, Dc, Tdl)
-    
+    R_req = R(Rg, Dc, Tdl, h, res)
+
     SNR_has = to_dB(SNR(P, Ll, Gt, La, Gr,
               Lspace, Lpointing,
               Lr, R_req, Ts))
