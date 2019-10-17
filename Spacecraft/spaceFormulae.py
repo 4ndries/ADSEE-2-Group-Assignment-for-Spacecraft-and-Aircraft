@@ -14,6 +14,7 @@ k = 1.38e-23    # [J/K]
 Re = 6371e3     # [m]
 c = 3e8         # [m/s]
 de = 146e6      # [m]
+mu = 3.986e14   # [m^3/s^2]
 
 ### functions
 def to_dB(n_, ref_=1):
@@ -80,14 +81,18 @@ D = antenna diameter [m]
 Returns the half-power angle [deg]'''
     return 21/(f_*D_*1e-9)  # convert Hz to GHz
 
-def R(Rg_, Dc_, Tdl_):
+def R(Rg_, Dc_, Tdl_, h_):
     '''Calculates the required data rate
 Accepts all variables in base units:
 Rg = spacecraft generated data rate [bit/s]
 Dc = duty cycle [-]
 Tdl = downlink time ratio [-]
 Returns the required data rate in [bit/s]'''
-    return Rg_*Dc_/Tdl_
+    T_ = 2*np.pi*np.sqrt((h_+Re)/mu)  # orbital period
+    d_ = Re*2*np.pi  # circumference of Earth alias distance scanned
+    lps_ = (d_/T_)  # lines per second scanned
+    B_ = Rg_*Dc_/Tdl_  # bits per line
+    return B_*lps_
 
 def SNR(P_, Ll_, Gt_, La_, Gr_, Ls_, Lpr_, Lr_, R_, Ts_):
     '''Accepts all variables from the link budget equation:
