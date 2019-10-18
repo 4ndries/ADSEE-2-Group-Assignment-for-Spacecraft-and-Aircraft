@@ -14,7 +14,7 @@ k = 1.38e-23    # [J/K]
 Re = 6371e3     # [m]
 c = 3e8         # [m/s]
 de = 146e6      # [m]
-mu = 3.986e14   # [m^3/s^2]
+mu_e = 3.986e14 # [m^3/s^2]
 
 ### functions
 def to_dB(n_, ref_=1):
@@ -44,12 +44,13 @@ S = (maximum) distance [m]
 Returns space loss [-]'''
     return (lambd_/(4*np.pi*S_))**2
 
-def S(h_, theta_=np.nan, ds_=np.nan):
+def S(h_, parent_=np.nan, theta_=np.nan, ds_=np.nan):
     '''Calculates the (worst case) distance between the satellite and a ground station
 Accepts all variables in base units:
 h = satellite orbit altitude [m]
+parent = parent celestial body [-] (optional)
 theta = elongation angle [deg] (optional)
-ds = distance between sun and the planet the mission orbits around [m]
+ds = distance between sun and the planet the mission orbits around [m] (optional)
 Returns (maximum) distance [m]
 Remarks: 
 - if theta and ds not specified or equal to np.nan, Earth orbit is assumed
@@ -57,6 +58,8 @@ Remarks:
 '''
     if not (np.isnan(theta_) and np.isnan(ds_)):  # calculate the interplanetary distance
         return np.sqrt(de**2+ds_**2-2*de*ds_*np.cos(theta_*np.pi/180))  # convert theta to rad
+    elif parent_ == 'Moon':
+        return 384400000
     else:
         return np.sqrt((Re+h_)**2-Re**2)
 
@@ -81,21 +84,25 @@ D = antenna diameter [m]
 Returns the half-power angle [deg]'''
     return 21/(f_*D_*1e-9)  # convert Hz to GHz
 
-def R(Rg_, Dc_, Tdl_, h_, pxs_):
+def R(res_, s_width_, bpp_, Dc_, Tdl_, h_, parent_):
     '''Calculates the required data rate
 Accepts all variables in base units:
-Rg = spacecraft generated data rate [bit/s]
+res = resolution [deg/pixel]
+s_width = swath width [deg]
+bpp = bits per pixel [bit/pix]
 Dc = duty cycle [-]
 Tdl = downlink time ratio [-]
 h = orbital altitude [m]
-pxs = pixel size [deg]
+parent = parent celestial body [-]
 Returns the required data rate in [bit/s]'''
-    T_ = 2*np.pi*np.sqrt((h_+Re)/mu)  # orbital period
-    d_ = Re*2*np.pi  # circumference of Earth alias distance scanned
+    Rp = {'Earth':Re, 'Moon':1737100, 'Mars':3389500, 'Venus':6051800, 'Europa':1560800}[parent_]
+    mu = {'Earth':mu_e, 'Moon':4.9048695e12, 'Mars':4.282837e13, 'Venus':3.24859e14, 'Europa':3.203454e12}[parent_]
+    T_ = 2*np.pi*np.sqrt((h_+Rp)**3/mu)  # orbital period
+    d_ = Rp*2*np.pi  # circumference of Earth alias distance scanned
     # lines per second scanned (using small angle approximation)
-    lps_= (d_/T_)/(h_*(pxs_/180*np.pi))  # meter per second scanned / meter per pixel
-    bpl_ = Rg_*Dc_/Tdl_  # bits per line
-    return bpl_*lps_
+    lps_= (d_/T_)/(h_*(res_/180*np.pi))  # meter per second scanned / meter per pixel
+    bpl_ = s_width_/res_*bpp_
+    return bpl_*lps_*Dc_/Tdl_
 
 def SNR(P_, Ll_, Gt_, La_, Gr_, Ls_, Lpr_, Lr_, R_, Ts_):
     '''Accepts all variables from the link budget equation:

@@ -34,19 +34,21 @@ for sc in data.columns[2:]:
     etr = 0.1*a12(f, Dr)  # assuming the same relation as in the example calculation
     # Include orbital velocity so we know how many rows per second are scanned, instead of one row per second...
     res = data[sc][15]/21600  # convert arcminutes to deg
-    Rg = data[sc][14]/res*data[sc][16]
+    s_width = data[sc][14]
+    bpp = data[sc][16]
     Dc = data[sc][17]
     Tdl = data[sc][18]/24  # hrs/day to ratio of hrs/24h
     Ts = 135  # assuming same value as given in example calculation
     coding = 'FSK'+str(data[sc][19])
     BER = data[sc][20]
+    parent = data[sc][21]
 
     Gt = Gpeak(Dt, lambd(f), etat)
     Gr = Gpeak(Dr, lambd(f), etar)
-    Lspace = Ls(lambd(f), S(h, theta, ds))
+    Lspace = Ls(lambd(f), S(h, parent, theta, ds))
     Lpointing = Lpr(ett, a12(f, Dt))*Lpr(etr, a12(f, Dr))
-    R_req = R(Rg, Dc, Tdl, h, res)
-
+    R_req = R(res, s_width, bpp, Dc, Tdl, h, parent)
+    print(R_req)
     SNR_has = to_dB(SNR(P, Ll, Gt, La, Gr,
               Lspace, Lpointing,
               Lr, R_req, Ts))
@@ -69,6 +71,8 @@ Eb/N0 required: {SNR_required}
 margin: {SNR_margin}''')
     print(f'''{sc} has a downlink SNR margin of {np.round(SNR_margin, 3)} dB\n''')
 
+print('='*50)
+
 # uplink
 for sc in data.columns[2:]:
     P = data[sc][2]
@@ -86,17 +90,18 @@ for sc in data.columns[2:]:
     ett = 0.1*a12(f, Dt)
     etr = data[sc][12]
     Rg = data[sc][13]
-    Dc = data[sc][17]
-    Tdl = data[sc][18]/24  # no uplink time given, for now using the downlink time but we'll see
+#    Dc = data[sc][17]  # not needed
+#    Tdl = data[sc][18]/24  # not needed
     Ts = 135
     coding = 'FSK'+str(data[sc][19])
     BER = data[sc][20]
+    parent = data[sc][21]
 
     Gt = Gpeak(Dt, lambd(f), etat)
     Gr = Gpeak(Dr, lambd(f), etar)
-    Lspace = Ls(lambd(f), S(h, theta, ds))
+    Lspace = Ls(lambd(f), S(h, parent, theta, ds))
     Lpointing = Lpr(ett, a12(f, Dt))*Lpr(etr, a12(f, Dr))
-    R_req = Rg  #R(Rg, Dc, Tdl)  # Uplink data rate independent of Payload duty cycle and downlink time
+    R_req = Rg  # Uplink data rate independent of Payload duty cycle and downlink time
 
     SNR_has = to_dB(SNR(P, Ll, Gt, La, Gr,
               Lspace, Lpointing,
