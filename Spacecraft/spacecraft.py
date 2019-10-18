@@ -33,7 +33,7 @@ for sc in data.columns[2:]:
     ett = data[sc][12]
     etr = 0.1*a12(f, Dr)  # assuming the same relation as in the example calculation
     # Include orbital velocity so we know how many rows per second are scanned, instead of one row per second...
-    res = data[sc][15]/21600  # convert arcminutes to deg
+    res = data[sc][15]/60  # convert arcminutes to deg
     s_width = data[sc][14]
     bpp = data[sc][16]
     Dc = data[sc][17]
