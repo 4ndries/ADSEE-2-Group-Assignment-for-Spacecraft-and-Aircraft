@@ -3,12 +3,18 @@
 # - 
 
 ### imports
+import sys
 import numpy as np
 import pandas as pd
 from spaceFormulae import *
 
-data = pd.read_excel('linkdata.xlsx')
-#data = pd.read_excel('original_linkdata.xlsx')
+# if you run the script with parameter -o or --original, you use linkdata_original.xlsx as input
+if len(sys.argv) > 1:
+    if sys.argv[1] in ['-o', '--original']:
+        data = pd.read_excel('original_linkdata.xlsx')
+else:
+    data = pd.read_excel('linkdata.xlsx')
+
 
 # downlink
 for sc in data.columns[2:]:
@@ -26,40 +32,46 @@ for sc in data.columns[2:]:
     ds = data[sc][11]*1e3  # convert km to m
     ett = data[sc][12]
     etr = 0.1*a12(f, Dr)  # assuming the same relation as in the example calculation
-    Rg = data[sc][14]/(data[sc][15]/21600)*data[sc][16]  # convert arcminutes to deg
+    # Include orbital velocity so we know how many rows per second are scanned, instead of one row per second...
+    res = data[sc][15]/60  # convert arcminutes to deg
+    s_width = data[sc][14]
+    bpp = data[sc][16]
     Dc = data[sc][17]
     Tdl = data[sc][18]/24  # hrs/day to ratio of hrs/24h
     Ts = 135  # assuming same value as given in example calculation
     coding = 'FSK'+str(data[sc][19])
     BER = data[sc][20]
+    parent = data[sc][21]
 
     Gt = Gpeak(Dt, lambd(f), etat)
     Gr = Gpeak(Dr, lambd(f), etar)
-    Lspace = Ls(lambd(f), S(h, theta, ds))
+    Lspace = Ls(lambd(f), S(h, parent, theta, ds))
     Lpointing = Lpr(ett, a12(f, Dt))*Lpr(etr, a12(f, Dr))
-    R_req = R(Rg, Dc, Tdl)
-    
+    R_req = R(res, s_width, bpp, Dc, Tdl, h, parent)
+#    print(R_req)
     SNR_has = to_dB(SNR(P, Ll, Gt, La, Gr,
               Lspace, Lpointing,
               Lr, R_req, Ts))
     SNR_required = SNR_req(BER, coding)
     SNR_margin = SNR_has - SNR_required
     print(f'''Downlink budget {sc} [dB]:
-P: {to_dB(P)}
-Ll: {to_dB(Ll)}
-Gt: {to_dB(Gt)}
-La: {to_dB(La)}
-Gr: {to_dB(Gr)}
-Ls: {to_dB(Lspace)}
-Lpr: {to_dB(Lpointing)}
-Lr: {to_dB(Lr)}
-1/R: {to_dB(1/R_req)}
-1/k: {to_dB(1/k)}
-1/Ts: {to_dB(1/Ts)}
-Eb/N0: {SNR_has}
-Eb/N0 required: {SNR_required}
-margin: {SNR_margin}''')
+P & {np.round(to_dB(P), 3)}
+Ll & {np.round(to_dB(Ll), 3)}
+Gt & {np.round(to_dB(Gt), 3)}
+La & {np.round(to_dB(La), 3)}
+Gr & {np.round(to_dB(Gr), 3)}
+Ls & {np.round(to_dB(Lspace), 3)}
+Lpr & {np.round(to_dB(Lpointing), 3)}
+Lr & {np.round(to_dB(Lr), 3)}
+1/R & {np.round(to_dB(1/R_req), 3)}
+1/k & {np.round(to_dB(1/k), 3)}
+1/Ts & {np.round(to_dB(1/Ts), 3)}
+Eb/N0 & {np.round(SNR_has, 3)}
+Eb/N0 required & {np.round(SNR_required, 3)}
+margin & {np.round(SNR_margin, 3)}''')
     print(f'''{sc} has a downlink SNR margin of {np.round(SNR_margin, 3)} dB\n''')
+
+print('='*50)
 
 # uplink
 for sc in data.columns[2:]:
@@ -78,17 +90,18 @@ for sc in data.columns[2:]:
     ett = 0.1*a12(f, Dt)
     etr = data[sc][12]
     Rg = data[sc][13]
-    Dc = data[sc][17]
-    Tdl = data[sc][18]/24  # no uplink time given, for now using the downlink time but we'll see
+#    Dc = data[sc][17]  # not needed
+#    Tdl = data[sc][18]/24  # not needed
     Ts = 135
     coding = 'FSK'+str(data[sc][19])
     BER = data[sc][20]
+    parent = data[sc][21]
 
     Gt = Gpeak(Dt, lambd(f), etat)
     Gr = Gpeak(Dr, lambd(f), etar)
-    Lspace = Ls(lambd(f), S(h, theta, ds))
+    Lspace = Ls(lambd(f), S(h, parent, theta, ds))
     Lpointing = Lpr(ett, a12(f, Dt))*Lpr(etr, a12(f, Dr))
-    R_req = R(Rg, Dc, Tdl)
+    R_req = Rg  # Uplink data rate independent of Payload duty cycle and downlink time
 
     SNR_has = to_dB(SNR(P, Ll, Gt, La, Gr,
               Lspace, Lpointing,
@@ -96,18 +109,18 @@ for sc in data.columns[2:]:
     SNR_required = SNR_req(BER, coding)
     SNR_margin = SNR_has - SNR_required
     print(f'''Uplink budget {sc} [dB]:
-P: {to_dB(P)}
-Ll: {to_dB(Ll)}
-Gt: {to_dB(Gt)}
-La: {to_dB(La)}
-Gr: {to_dB(Gr)}
-Ls: {to_dB(Lspace)}1
-Lpr: {to_dB(Lpointing)}
-Lr: {to_dB(Lr)}
-1/R: {to_dB(1/R_req)}
-1/k: {to_dB(1/k)}
-1/Ts: {to_dB(1/Ts)}
-Eb/N0: {SNR_has}
-Eb/N0 required: {SNR_required}
-margin: {SNR_margin}''')
+P & {np.round(to_dB(P), 3)}
+Ll & {np.round(to_dB(Ll), 3)}
+Gt & {np.round(to_dB(Gt), 3)}
+La & {np.round(to_dB(La), 3)}
+Gr & {np.round(to_dB(Gr), 3)}
+Ls & {np.round(to_dB(Lspace), 3)}1
+Lpr & {np.round(to_dB(Lpointing), 3)}
+Lr & {np.round(to_dB(Lr), 3)}
+1/R & {np.round(to_dB(1/R_req), 3)}
+1/k & {np.round(to_dB(1/k), 3)}
+1/Ts & {np.round(to_dB(1/Ts), 3)}
+Eb/N0 & {np.round(SNR_has, 3)}
+Eb/N0 required & {np.round(SNR_required, 3)}
+margin & {np.round(SNR_margin, 3)}''')
     print(f'''{sc} has an uplink SNR margin of {np.round(SNR_margin, 3)} dB\n''')
