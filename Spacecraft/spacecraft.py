@@ -73,7 +73,7 @@ for sc in data.columns[2:]:
     Dc = data[sc][17]
     Tdl = data[sc][18]/24  # hrs/day to ratio of hrs/24h
     Ts = 135  # assuming same value as given in example calculation
-    coding = 'FSK'+str(data[sc][19])
+    coding = data[sc][19]
     BER = data[sc][20]
     parent = data[sc][21]
 
@@ -113,7 +113,7 @@ for sc in data.columns[2:]:
 #    Dc = data[sc][17]  # not needed
 #    Tdl = data[sc][18]/24  # not needed
     Ts = 135
-    coding = 'FSK'+str(data[sc][19])
+    coding = data[sc][19]
     BER = data[sc][20]
     parent = data[sc][21]
 
