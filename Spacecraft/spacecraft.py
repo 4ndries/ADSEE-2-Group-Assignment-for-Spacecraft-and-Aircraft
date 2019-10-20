@@ -16,6 +16,40 @@ else:
     data = pd.read_excel('linkdata.xlsx')
 
 
+def link_budget_template(*args):
+    P_, Ll_, Gt_, La_, Gr_, Ls_, Lpr_, Lr_, R_1, k_1, Ts_1, SNR_, SNR_req_, SNR_margin_ = [np.round(to_dB(arg), 3) for arg in args]
+    return fr'''        \hline
+        Parameter & Value $[dB]$ & Unit \\
+        \hline \hline
+        P & ${P_}$ & $W$ \\
+        \hline
+        Ll & ${Ll_}$ & $-$ \\
+        \hline
+        Gt & ${Gt_}$ & $-$ \\
+        \hline
+        La & ${La_}$ & $-$ \\
+        \hline
+        Gr & ${Gr_}$ & $-$ \\
+        \hline
+        Ls & ${Ls_}$ & $-$ \\
+        \hline
+        Lpr & ${Lpr_}$ & $-$ \\
+        \hline
+        Lr & ${Lr_}$ & $-$ \\
+        \hline
+        1/R & ${R_1}$ & $(bit/s)^{-1}$ \\
+        \hline
+        1/k & ${k_1}$ & $(J/K)^{-1}$ \\
+        \hline
+        1/Ts & ${Ts_1}$ & $K^{-1}$ \\
+        \hline
+        Eb/N0 & ${SNR_}$ & $-$ \\
+        \hline
+        Eb/N0 required & ${SNR_req_}$ & $-$ \\
+        \hline \hline
+        SNR margin & ${SNR_margin_}$ & $-$ \\
+        \hline'''
+    
 # downlink
 for sc in data.columns[2:]:
     P = data[sc][1]
@@ -54,21 +88,7 @@ for sc in data.columns[2:]:
               Lr, R_req, Ts))
     SNR_required = SNR_req(BER, coding)
     SNR_margin = SNR_has - SNR_required
-    print(f'''Downlink budget {sc} [dB]:
-P & {np.round(to_dB(P), 3)}
-Ll & {np.round(to_dB(Ll), 3)}
-Gt & {np.round(to_dB(Gt), 3)}
-La & {np.round(to_dB(La), 3)}
-Gr & {np.round(to_dB(Gr), 3)}
-Ls & {np.round(to_dB(Lspace), 3)}
-Lpr & {np.round(to_dB(Lpointing), 3)}
-Lr & {np.round(to_dB(Lr), 3)}
-1/R & {np.round(to_dB(1/R_req), 3)}
-1/k & {np.round(to_dB(1/k), 3)}
-1/Ts & {np.round(to_dB(1/Ts), 3)}
-Eb/N0 & {np.round(SNR_has, 3)}
-Eb/N0 required & {np.round(SNR_required, 3)}
-margin & {np.round(SNR_margin, 3)}''')
+    print(link_budget_template(P, Ll, Gt, La, Gr, Lspace, Lpointing, Lr, 1/R_req, 1/k, 1/Ts, from_dB(SNR_has), from_dB(SNR_required), from_dB(SNR_margin)))
     print(f'''{sc} has a downlink SNR margin of {np.round(SNR_margin, 3)} dB\n''')
 
 print('='*50)
@@ -108,19 +128,5 @@ for sc in data.columns[2:]:
               Lr, R_req, Ts))
     SNR_required = SNR_req(BER, coding)
     SNR_margin = SNR_has - SNR_required
-    print(f'''Uplink budget {sc} [dB]:
-P & {np.round(to_dB(P), 3)}
-Ll & {np.round(to_dB(Ll), 3)}
-Gt & {np.round(to_dB(Gt), 3)}
-La & {np.round(to_dB(La), 3)}
-Gr & {np.round(to_dB(Gr), 3)}
-Ls & {np.round(to_dB(Lspace), 3)}1
-Lpr & {np.round(to_dB(Lpointing), 3)}
-Lr & {np.round(to_dB(Lr), 3)}
-1/R & {np.round(to_dB(1/R_req), 3)}
-1/k & {np.round(to_dB(1/k), 3)}
-1/Ts & {np.round(to_dB(1/Ts), 3)}
-Eb/N0 & {np.round(SNR_has, 3)}
-Eb/N0 required & {np.round(SNR_required, 3)}
-margin & {np.round(SNR_margin, 3)}''')
+    print(link_budget_template(P, Ll, Gt, La, Gr, Lspace, Lpointing, Lr, 1/R_req, 1/k, 1/Ts, from_dB(SNR_has), from_dB(SNR_required), from_dB(SNR_margin)))
     print(f'''{sc} has an uplink SNR margin of {np.round(SNR_margin, 3)} dB\n''')
