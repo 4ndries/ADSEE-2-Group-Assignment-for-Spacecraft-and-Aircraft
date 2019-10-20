@@ -123,9 +123,9 @@ def SNR_req(BER_=1e-6, coding_='8FSK'):
     '''Calculates the required SNR [dB] given a certain encoding and BER
 For now this is a dummy function returning preset values read manually from the graph
 Remark: when using the function to calculate the SNR, it gives a lower bound, so the actual required SNR may be higher'''
-    if coding=='BPSK_Viterbi':
+    if coding_=='BPSK_Viterbi':
         return 5
-    elif coding=='8FSK':
+    elif coding_=='8FSK':
         return 10
     elif 0<BER_/2<1 and '8FSK' in coding_:
         return 2/3*sp.erfcinv(BER_/2)**2
